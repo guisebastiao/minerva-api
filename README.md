@@ -5,7 +5,7 @@ Minerva transforma a memorização em um processo natural e eficaz, usando repet
 
 #### Os requisitos do sistema se encontra seguinte documento do google sheets:
 
-- [**Requisito do Sistema** - Google Sheet](https://docs.google.com/spreadsheets/d/1z2fRYLJCeE3sy86mWETYFgMxiWDYOYWO1YcKAw5ul-o/edit?usp=sharing)
+- [**Requisitos do Sistema** - Google Sheet](https://docs.google.com/spreadsheets/d/1z2fRYLJCeE3sy86mWETYFgMxiWDYOYWO1YcKAw5ul-o/edit?usp=sharing)
 
 ## Diagrama de Classe UML
 
