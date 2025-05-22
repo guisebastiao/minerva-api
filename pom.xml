@@ -12,9 +12,9 @@
 	</parent>
 
 	<groupId>com.minerva</groupId>
-	<artifactId>Minerva API</artifactId>
+	<artifactId>minerva-api</artifactId>
 	<version>1.0.0</version>
-	<name>minerva-api</name>
+	<name>Minerva API</name>
 	<description>API de gerenciamento de flashcards com repetição espaçada</description>
 	<url>https://github.com/guisebastiao/minerva-api</url>
 
