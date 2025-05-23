@@ -30,7 +30,6 @@ public class User implements UserDetails {
     private String password;
 
     @OneToOne(mappedBy = "user")
-    @PrimaryKeyJoinColumn
     private ResetPassword resetPassword;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

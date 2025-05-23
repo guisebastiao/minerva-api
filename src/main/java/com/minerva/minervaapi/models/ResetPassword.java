@@ -14,7 +14,7 @@ import java.util.UUID;
 public class ResetPassword {
 
     @Id
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true, nullable = false)
@@ -24,7 +24,6 @@ public class ResetPassword {
     private LocalDateTime expiryDate;
 
     @OneToOne
-    @MapsId
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
