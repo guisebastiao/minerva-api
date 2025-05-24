@@ -6,8 +6,10 @@ import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
 import com.minerva.minervaapi.controllers.mappers.DeckMapper;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
+import com.minerva.minervaapi.models.Collection;
 import com.minerva.minervaapi.models.Deck;
 import com.minerva.minervaapi.models.User;
+import com.minerva.minervaapi.repositories.CollectionRepository;
 import com.minerva.minervaapi.repositories.DeckRepository;
 import com.minerva.minervaapi.security.AuthProvider;
 import com.minerva.minervaapi.services.DeckService;
@@ -27,6 +29,9 @@ public class DeckServiceImpl implements DeckService {
     private DeckRepository deckRepository;
 
     @Autowired
+    private CollectionRepository collectionRepository;
+
+    @Autowired
     private AuthProvider authProvider;
 
     @Autowired
@@ -35,12 +40,20 @@ public class DeckServiceImpl implements DeckService {
     @Override
     @Transactional
     public DefaultDTO createDeck(DeckDTO deckDTO) {
+        User user = this.getAuthenticatedUser();
+
         Deck deck = this.deckMapper.toEntity(deckDTO);
         deck.setUser(this.getAuthenticatedUser());
         deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
-        this.deckRepository.save(deck);
+        Deck savedDeck = this.deckRepository.save(deck);
+
+        Collection collection = new Collection();
+        collection.setUser(user);
+        collection.setDeck(savedDeck);
+
+        this.collectionRepository.save(collection);
 
         return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
