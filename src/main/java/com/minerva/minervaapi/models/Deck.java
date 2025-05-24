@@ -27,11 +27,15 @@ public class Deck {
     @Column(nullable = false)
     private Boolean isPublic;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private UUID publicId;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL)
     private List<Collection> collections;

@@ -33,6 +33,9 @@ public class User implements UserDetails {
     private ResetPassword resetPassword;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Deck> decks;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Collection> collections;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
