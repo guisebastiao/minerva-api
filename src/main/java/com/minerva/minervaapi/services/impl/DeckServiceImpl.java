@@ -62,9 +62,6 @@ public class DeckServiceImpl implements DeckService {
     public DefaultDTO findDeckById(String deckId) {
         Deck deck = this.findCollectionById(deckId);
 
-        System.out.println(deck.getUser().getName());
-        System.out.println(deck.getIsPublic());
-
         if(!deck.getIsPublic() && !deck.getUser().getId().equals(this.getAuthenticatedUser().getId())) {
             throw new UnauthorizedException("Você não tem permissão para visualizar essa coleção");
         }
@@ -108,7 +105,7 @@ public class DeckServiceImpl implements DeckService {
 
     private void checkDeckCreator(User creator) {
         if(!creator.getId().equals(this.getAuthenticatedUser().getId())) {
-            throw new UnauthorizedException("Você não tem permissão para acessar este deck");
+            throw new UnauthorizedException("Você não tem permissão para acessar esta coleção");
         }
     }
 }

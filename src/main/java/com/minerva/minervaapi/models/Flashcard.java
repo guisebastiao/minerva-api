@@ -20,7 +20,7 @@ public class Flashcard {
     private String question;
 
     @Column(length = 300, nullable = false)
-    private String awsner;
+    private String answer;
 
     @ManyToOne
     @JoinColumn(name = "deck_id", nullable = false)
