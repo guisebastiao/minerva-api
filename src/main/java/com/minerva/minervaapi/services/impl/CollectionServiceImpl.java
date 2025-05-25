@@ -6,7 +6,6 @@ import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
 import com.minerva.minervaapi.models.*;
-import com.minerva.minervaapi.models.Collection;
 import com.minerva.minervaapi.repositories.CollectionRepository;
 import com.minerva.minervaapi.repositories.DeckRepository;
 import com.minerva.minervaapi.repositories.ReviewRepository;
@@ -18,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -62,31 +63,14 @@ public class CollectionServiceImpl implements CollectionService {
         this.collectionRepository.save(collection);
 
         List<Review> reviews = new ArrayList<>();
-        for (Flashcard flashcard : deck.getFlashcards()) {
-            Optional<Review> existingReview = reviewRepository.findByFlashcardAndDeckAndUser(flashcard, deck, user);
 
-            if (existingReview.isEmpty()) {
-                Review review = new Review();
-                review.setDeck(deck);
-                review.setUser(user);
-                review.setFlashcard(flashcard);
-                reviews.add(review);
-            } else {
-                System.out.println("Revisão já existe para flashcard_id=" + flashcard.getId() + ", deck_id=" + deck.getId() + ", user_id=" + user.getId());
-            }
-        }
-
-        if (!reviews.isEmpty()) {
-            try {
-                this.reviewRepository.saveAll(reviews);
-                System.out.println("Criadas " + reviews.size() + " revisões para usuário " + user.getUsername());
-            } catch (RuntimeException e) {
-                System.err.println("Erro ao salvar revisões: " + e.getMessage() + ", flashcard_ids=" + reviews.stream().map(r -> r.getFlashcard().getId().toString()).collect(Collectors.joining(",")));
-                return new DefaultDTO("Erro ao adicionar coleção devido a revisões duplicadas", Boolean.FALSE, null, null, null);
-            }
-        } else {
-            System.out.println("Nenhuma nova revisão criada para usuário " + user.getUsername());
-        }
+        deck.getFlashcards().forEach(flashcard -> {
+            Review review = new Review();
+            review.setDeck(deck);
+            review.setUser(user);
+            review.setFlashcard(flashcard);
+            reviews.add(review);
+        });
 
         this.reviewRepository.saveAll(reviews);
 

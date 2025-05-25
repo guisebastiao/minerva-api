@@ -35,28 +35,18 @@ public class CommunityServiceImpl implements CommunityService {
 
         List<DeckResponseDTO> data = resultPage.getContent().stream()
                 .map(this.deckMapper::toResponseDTO)
+                .sorted((a, b) -> {
+                    if ("assessment".equalsIgnoreCase(order)) {
+                        return Double.compare(b.assessment(), a.assessment());
+                    }
+                    return 0;
+                })
                 .toList();
 
         return new DefaultDTO("Coleções retornadas com sucesso", Boolean.TRUE, data, pagingDTO, null);
     }
 
     private Sort sorting(String order) {
-        Sort sort;
-
-        switch (order.toLowerCase()) {
-            case "assessment": {
-                sort = Sort.by(Sort.Direction.DESC, "assessment");
-                break;
-            }
-            case "date": {
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
-                break;
-            }
-            default: {
-                sort = Sort.unsorted();
-            }
-        }
-
-        return sort;
+        return "date".equalsIgnoreCase(order) ? Sort.by(Sort.Direction.DESC, "createdAt") : Sort.unsorted();
     }
 }
