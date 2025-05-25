@@ -13,6 +13,7 @@ public record DeckResponseDTO(
       UserResponseDTO user,
       Boolean belongsToAuthUser,
       Boolean belongsToCollectionUser,
+      Boolean authUserAssessmentDeck,
       Double assessment,
       ReviewResponseDTO review
 ){ }

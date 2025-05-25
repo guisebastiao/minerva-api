@@ -55,6 +55,13 @@ public class DeckMapperHelper {
         return collection.isPresent();
     }
 
+    @Named("isAuthUserAssessmentDeck")
+    public Boolean isAuthUserAssessmentDeck(Deck deck) {
+        User user = authProvider.getAuthenticatedUser();
+        Optional<Assessment> assessment = this.assessmentRepository.findByDeckAndUser(deck, user);
+        return assessment.isPresent();
+    }
+
     @Named("findStudyCollection")
     public ReviewResponseDTO findStudyCollection(Deck deck) {
         LocalDate currentDate = LocalDate.now();
