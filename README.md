@@ -11,4 +11,4 @@ Minerva transforma a memorização em um processo natural e eficaz, usando repet
 
 #### O diagrama de classe se encontra aqui abaixo:
 
-![Minerva Class Diagram](https://github.com/user-attachments/assets/a7bf8c99-0f75-48c0-89a0-8d8a03618f7e)
+![Minerva Class Diagram](https://github.com/user-attachments/assets/4d04ad9c-ef55-4017-b245-316fab46895d)
