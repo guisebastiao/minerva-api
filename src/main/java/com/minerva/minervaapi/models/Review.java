@@ -19,25 +19,32 @@ public class Review {
     private UUID id;
 
     @Column(nullable = false)
-    private Integer quality;
+    private Integer quality = 0;
 
     @Column(name = "easiness_factor", nullable = false)
-    private Double easinessFactor;
+    private Double easinessFactor = 2.5;
+
+    @Column(name = "repetition", nullable = false)
+    private Integer repetition = 0;
 
     @Column(name = "reviewed_at", nullable = false)
-    private LocalDateTime reviewedAt;
+    private LocalDateTime reviewedAt = LocalDateTime.now();
 
     @Column(name = "next_review_date", nullable = false)
-    private LocalDate nextReviewDate;
+    private LocalDate nextReviewDate = LocalDate.now();
 
     @Column(name = "days_interval", nullable = false)
-    private Integer daysInterval;
+    private Integer daysInterval = 1;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "flashcard_id", nullable = false)
     private Flashcard flashcard;
+
+    @ManyToOne
+    @JoinColumn(name = "deck_id", nullable = false)
+    private Deck deck;
 }

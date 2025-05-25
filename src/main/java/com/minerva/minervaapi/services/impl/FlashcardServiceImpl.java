@@ -9,15 +9,18 @@ import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
 import com.minerva.minervaapi.models.Deck;
 import com.minerva.minervaapi.models.Flashcard;
+import com.minerva.minervaapi.models.Review;
 import com.minerva.minervaapi.models.User;
 import com.minerva.minervaapi.repositories.DeckRepository;
 import com.minerva.minervaapi.repositories.FlashcardRepository;
+import com.minerva.minervaapi.repositories.ReviewRepository;
 import com.minerva.minervaapi.security.AuthProvider;
 import com.minerva.minervaapi.services.FlashcardService;
 import com.minerva.minervaapi.utils.UUIDConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,6 +37,9 @@ public class FlashcardServiceImpl implements FlashcardService {
     private DeckRepository deckRepository;
 
     @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
     private FlashcardMapper flashcardMapper;
 
     @Autowired
@@ -48,6 +54,18 @@ public class FlashcardServiceImpl implements FlashcardService {
         flashcardList.forEach(flashcard -> flashcard.setDeck(deck));
 
         this.flashcardRepository.saveAll(flashcardList);
+
+        List<Review> reviews = new ArrayList<>();
+
+        deck.getFlashcards().forEach(flashcard -> {
+            Review review = new Review();
+            review.setDeck(deck);
+            review.setUser(deck.getUser());
+            review.setFlashcard(flashcard);
+            reviews.add(review);
+        });
+
+        this.reviewRepository.saveAll(reviews);
 
         return new DefaultDTO("Flashcards criados com sucesso", Boolean.TRUE, null, null, null);
     }

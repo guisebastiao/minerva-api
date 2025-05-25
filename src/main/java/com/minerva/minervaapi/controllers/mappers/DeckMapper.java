@@ -12,6 +12,7 @@ public interface DeckMapper {
     @Mapping(target = "belongsToAuthUser", source = ".", qualifiedByName = "isBelongsToAuthUser")
     @Mapping(target = "assessment", source = ".", qualifiedByName = "findAssessment")
     @Mapping(target = "belongsToCollectionUser", source = ".", qualifiedByName = "isBelongsToCollectionUser")
+    @Mapping(target = "review", source = ".", qualifiedByName = "findStudyCollection")
     DeckResponseDTO toResponseDTO(Deck deck);
 
     Deck toEntity(DeckDTO deckDTO);

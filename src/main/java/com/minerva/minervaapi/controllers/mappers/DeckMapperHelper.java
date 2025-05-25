@@ -1,13 +1,16 @@
 package com.minerva.minervaapi.controllers.mappers;
 
+import com.minerva.minervaapi.controllers.dtos.ReviewResponseDTO;
 import com.minerva.minervaapi.models.*;
 import com.minerva.minervaapi.repositories.AssessmentRepository;
 import com.minerva.minervaapi.repositories.CollectionRepository;
+import com.minerva.minervaapi.repositories.ReviewRepository;
 import com.minerva.minervaapi.security.AuthProvider;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +25,12 @@ public class DeckMapperHelper {
 
     @Autowired
     private CollectionRepository collectionRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private FlashcardMapper flashcardMapper;
 
     @Named("isBelongsToAuthUser")
     public Boolean isBelongsToAuthUser(Deck deck) {
@@ -44,6 +53,22 @@ public class DeckMapperHelper {
         CollectionPk pk = this.generateCollectionPk(user, deck);
         Optional<Collection> collection = this.collectionRepository.findById(pk);
         return collection.isPresent();
+    }
+
+    @Named("findStudyCollection")
+    public ReviewResponseDTO findStudyCollection(Deck deck) {
+        LocalDate currentDate = LocalDate.now();
+        User user = authProvider.getAuthenticatedUser();
+
+        List<Review> reviewsFound = reviewRepository.findAllByDeckAndUser(deck, user);
+
+        List<Flashcard> flashcardsToStudy = reviewsFound.stream()
+                .filter(review -> review.getNextReviewDate() == null || !currentDate.isBefore(review.getNextReviewDate()))
+                .map(Review::getFlashcard)
+                .distinct()
+                .toList();
+
+        return new ReviewResponseDTO(flashcardsToStudy.size(), deck.getFlashcards().size(), flashcardsToStudy.isEmpty());
     }
 
     private CollectionPk generateCollectionPk(User user, Deck deck) {

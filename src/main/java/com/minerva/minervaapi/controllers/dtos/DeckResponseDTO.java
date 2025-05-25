@@ -13,5 +13,6 @@ public record DeckResponseDTO(
       UserResponseDTO user,
       Boolean belongsToAuthUser,
       Boolean belongsToCollectionUser,
-      Double assessment
+      Double assessment,
+      ReviewResponseDTO review
 ){ }

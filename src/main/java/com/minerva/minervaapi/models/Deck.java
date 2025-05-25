@@ -45,4 +45,7 @@ public class Deck {
 
     @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL)
     private List<Flashcard> flashcards;
+
+    @OneToMany(mappedBy = "deck")
+    private List<Review> reviews;
 }
