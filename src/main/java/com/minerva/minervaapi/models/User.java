@@ -39,6 +39,9 @@ public class User implements UserDetails {
     private List<Collection> collections;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Assessment> assessments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
     @Override

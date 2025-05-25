@@ -10,5 +10,8 @@ public record DeckResponseDTO(
       Boolean isPublic,
       UUID publicId,
       LocalDateTime createdAt,
-      Boolean belongsToAuthUser
+      UserResponseDTO user,
+      Boolean belongsToAuthUser,
+      Boolean belongsToCollectionUser,
+      Double assessment
 ){ }

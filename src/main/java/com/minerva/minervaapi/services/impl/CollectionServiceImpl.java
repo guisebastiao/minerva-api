@@ -83,7 +83,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         Pageable pageable = PageRequest.of(offset, limit);
 
-        Page<Collection> resultPage = collectionRepository.findAllByUserId(user.getId(), pageable);
+        Page<Collection> resultPage = collectionRepository.findAllByUser(user, pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 

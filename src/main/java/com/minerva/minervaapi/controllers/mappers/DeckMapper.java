@@ -6,13 +6,13 @@ import com.minerva.minervaapi.models.Deck;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {DeckMapperHelper.class})
+@Mapper(componentModel = "spring", uses = {DeckMapperHelper.class, UserMapper.class})
 public interface DeckMapper {
 
-    @Mapping(target = "belongsToAuthUser", source = ".", qualifiedByName = "isAuthUser")
+    @Mapping(target = "belongsToAuthUser", source = ".", qualifiedByName = "isBelongsToAuthUser")
+    @Mapping(target = "assessment", source = ".", qualifiedByName = "findAssessment")
+    @Mapping(target = "belongsToCollectionUser", source = ".", qualifiedByName = "isBelongsToCollectionUser")
     DeckResponseDTO toResponseDTO(Deck deck);
 
-    DeckDTO toDTO(Deck deck);
     Deck toEntity(DeckDTO deckDTO);
-    Deck toEntity(DeckResponseDTO deckDTO);
 }
