@@ -2,6 +2,7 @@ package com.minerva.minervaapi.services.impl;
 
 import com.minerva.minervaapi.controllers.dtos.*;
 import com.minerva.minervaapi.controllers.mappers.CollectionMapper;
+import com.minerva.minervaapi.controllers.mappers.FlashcardMapper;
 import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +38,9 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Autowired
     private CollectionMapper collectionMapper;
+
+    @Autowired
+    private FlashcardMapper flashcardMapper;
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -97,6 +102,29 @@ public class CollectionServiceImpl implements CollectionService {
         String message = String.format(collectionFavoriteDTO.favorite() ? "Coleção adicionada como favorita" : "Coleção removida como favorita");
 
         return new DefaultDTO(message, Boolean.TRUE, null, null, null);
+    }
+
+    @Override
+    public DefaultDTO findAllCollectionsToStudy(String deckId, int offset, int limit) {
+        User user = this.getAuthenticatedUser();
+        Deck deck = this.findDeckById(UUIDConverter.toUUID(deckId));
+
+        LocalDate currentDate = LocalDate.now();
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        Page<Review> resultPage = reviewRepository.findByDeckAndUserAndNextReviewDateLessThanEqualOrNextReviewDateIsNull(deck, user, currentDate, pageable);
+
+        PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
+
+        List<FlashcardResponseDTO> data = resultPage.getContent().stream()
+                .map(review -> {
+                    Flashcard flashcard = review.getFlashcard();
+                    return this.flashcardMapper.toDTO(flashcard);
+                })
+                .toList();
+
+
+        return new DefaultDTO("Flashcards retornados com sucesso", Boolean.TRUE, data, pagingDTO, null);
     }
 
     @Override

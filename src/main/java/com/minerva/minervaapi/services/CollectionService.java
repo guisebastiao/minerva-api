@@ -8,6 +8,7 @@ public interface CollectionService {
 
     DefaultDTO addNewCollection(CollectionDTO collectionDTO);
     DefaultDTO addFavorite(String deckId, CollectionFavoriteDTO collectionFavoriteDTO);
+    DefaultDTO findAllCollectionsToStudy(String deckId, int offset, int limit);
     DefaultDTO findAllCollections(int offset, int limit);
     DefaultDTO deleteCollection(String deckId);
 }

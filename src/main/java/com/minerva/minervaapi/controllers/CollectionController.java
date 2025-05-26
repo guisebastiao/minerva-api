@@ -35,6 +35,12 @@ public class CollectionController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/to-study/{deckId}")
+    public ResponseEntity<DefaultDTO> findAllCollectionsToStudy(@PathVariable String deckId, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "20") int limit) {
+        DefaultDTO response = this.collectionService.findAllCollectionsToStudy(deckId, offset, limit);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @DeleteMapping("/{deckId}")
     public ResponseEntity<DefaultDTO> deleteCollection(@PathVariable String deckId) {
         DefaultDTO response = this.collectionService.deleteCollection(deckId);
