@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.List;
@@ -27,6 +28,21 @@ public class GlobalExceptionHandler {
                 .map(fe -> new FieldErrorDTO(fe.getField(), fe.getDefaultMessage())
                 ).toList();
 
+        DefaultDTO response = new DefaultDTO("Erro de validação", Boolean.FALSE, null, null, fieldErrorDTOs);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<DefaultDTO> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        List<FieldErrorDTO> fieldErrorDTOs = e.getAllValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream()
+                        .filter(error -> error instanceof FieldError)
+                        .map(error -> {
+                            FieldError fieldError = (FieldError) error;
+                            return new FieldErrorDTO(fieldError.getField(), fieldError.getDefaultMessage());
+                        }))
+                .distinct()
+                .toList();
         DefaultDTO response = new DefaultDTO("Erro de validação", Boolean.FALSE, null, null, fieldErrorDTOs);
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
