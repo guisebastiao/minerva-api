@@ -18,9 +18,6 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private Integer quality = 0;
-
     @Column(name = "easiness_factor", nullable = false)
     private Double easinessFactor = 2.5;
 
