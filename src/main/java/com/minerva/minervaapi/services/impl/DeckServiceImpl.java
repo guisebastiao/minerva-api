@@ -55,7 +55,7 @@ public class DeckServiceImpl implements DeckService {
 
         this.collectionRepository.save(collection);
 
-        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
+        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, savedDeck.getId(), null, null);
     }
 
     @Override
