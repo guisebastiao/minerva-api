@@ -128,12 +128,12 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public DefaultDTO findAllCollections(int offset, int limit) {
+    public DefaultDTO findAllCollections(String search, int offset, int limit) {
         User user = getAuthenticatedUser();
 
         Pageable pageable = PageRequest.of(offset, limit);
 
-        Page<Collection> resultPage = collectionRepository.findAllByUser(user, pageable);
+        Page<Collection> resultPage = collectionRepository.findAllByUserAndDeck_TitleContainingIgnoreCase(user, search, pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
