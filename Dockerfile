@@ -1,16 +1,19 @@
-FROM ubuntu:latest AS build
+FROM eclipse-temurin:21-jdk AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
+WORKDIR /app
+
 COPY . .
 
-RUN apt-get install maven -y
-RUN mvn clean install
+RUN apt-get update && apt-get install -y maven
 
-FROM openjdk:21-jdk-slim
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/minerva-api-1.0.0.jar app.jar
 
 EXPOSE 8080
 
-COPY --from=build /target/minerva-api-1.0.0.jar app.jar
-
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT ["java", "-jar", "app.jar"]
