@@ -30,8 +30,8 @@ public class CollectionController {
     }
 
     @GetMapping
-    public ResponseEntity<DefaultDTO> findAllCollections(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "20") int limit) {
-        DefaultDTO response = this.collectionService.findAllCollections(offset, limit);
+    public ResponseEntity<DefaultDTO> findAllCollections(@RequestParam(name = "search", required = false, defaultValue = "") String search, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "20") int limit) {
+        DefaultDTO response = this.collectionService.findAllCollections(search, offset, limit);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

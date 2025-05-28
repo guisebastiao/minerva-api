@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, CollectionPk> { ;
-    Page<Collection> findAllByUser(User user, Pageable pageable);
+    Page<Collection> findAllByUserAndDeck_TitleContainingIgnoreCase(User user, String search, Pageable pageable);
 }
