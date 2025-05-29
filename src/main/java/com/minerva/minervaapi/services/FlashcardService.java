@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface FlashcardService {
 
-    DefaultDTO createFlashcards(String deckId, List<FlashcardDTO> flashcards);
     DefaultDTO updateFlashcards(List<FlashcardUpdateDTO> flashcards);
     DefaultDTO deleteFlashcard(String flashcardId);
 }
