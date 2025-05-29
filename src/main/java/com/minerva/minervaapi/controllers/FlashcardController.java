@@ -18,12 +18,6 @@ public class FlashcardController {
     @Autowired
     private FlashcardService flashcardService;
 
-    @PostMapping("/{deckId}")
-    public ResponseEntity<DefaultDTO> createFlashcards(@PathVariable String deckId, @RequestBody @Valid ValidList<FlashcardDTO> flashcards) {
-        DefaultDTO response = this.flashcardService.createFlashcards(deckId, flashcards);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @PutMapping
     public ResponseEntity<DefaultDTO> updateFlashcard(@RequestBody @Valid ValidList<FlashcardUpdateDTO> flashcards) {
         DefaultDTO response = this.flashcardService.updateFlashcards(flashcards);

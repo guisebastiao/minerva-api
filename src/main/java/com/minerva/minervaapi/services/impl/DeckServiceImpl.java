@@ -4,13 +4,14 @@ import com.minerva.minervaapi.controllers.dtos.DeckDTO;
 import com.minerva.minervaapi.controllers.dtos.DeckResponseDTO;
 import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
 import com.minerva.minervaapi.controllers.mappers.DeckMapper;
+import com.minerva.minervaapi.controllers.mappers.FlashcardMapper;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
-import com.minerva.minervaapi.models.Collection;
-import com.minerva.minervaapi.models.Deck;
-import com.minerva.minervaapi.models.User;
+import com.minerva.minervaapi.models.*;
 import com.minerva.minervaapi.repositories.CollectionRepository;
 import com.minerva.minervaapi.repositories.DeckRepository;
+import com.minerva.minervaapi.repositories.FlashcardRepository;
+import com.minerva.minervaapi.repositories.ReviewRepository;
 import com.minerva.minervaapi.security.AuthProvider;
 import com.minerva.minervaapi.services.DeckService;
 import com.minerva.minervaapi.utils.UUIDConverter;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,10 +35,19 @@ public class DeckServiceImpl implements DeckService {
     private CollectionRepository collectionRepository;
 
     @Autowired
+    private FlashcardRepository flashcardRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
     private AuthProvider authProvider;
 
     @Autowired
     private DeckMapper deckMapper;
+
+    @Autowired
+    private FlashcardMapper flashcardMapper;
 
     @Override
     @Transactional
@@ -55,7 +67,27 @@ public class DeckServiceImpl implements DeckService {
 
         this.collectionRepository.save(collection);
 
-        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, savedDeck.getId(), null, null);
+        List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
+
+        flashcardList.forEach(flashcard -> flashcard.setDeck(savedDeck));
+
+        this.flashcardRepository.saveAll(flashcardList);
+
+        savedDeck.setFlashcards(flashcardList);
+
+        List<Review> reviews = new ArrayList<>();
+
+        savedDeck.getFlashcards().forEach(flashcard -> {
+            Review review = new Review();
+            review.setDeck(deck);
+            review.setUser(deck.getUser());
+            review.setFlashcard(flashcard);
+            reviews.add(review);
+        });
+
+        this.reviewRepository.saveAll(reviews);
+
+        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
 
     @Override
