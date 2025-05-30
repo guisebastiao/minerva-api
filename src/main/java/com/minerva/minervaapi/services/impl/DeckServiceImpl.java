@@ -17,6 +17,7 @@ import com.minerva.minervaapi.services.DeckService;
 import com.minerva.minervaapi.utils.UUIDConverter;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,7 @@ public class DeckServiceImpl implements DeckService {
     private FlashcardMapper flashcardMapper;
 
     @Override
+    @Transactional
     public DefaultDTO createDeck(DeckDTO deckDTO) {
         User user = this.getAuthenticatedUser();
 
@@ -58,20 +60,22 @@ public class DeckServiceImpl implements DeckService {
         deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
-        Deck savedDeck = this.deckRepository.save(deck);
+        Deck savedDeck = this.deckRepository.saveAndFlush(deck);
 
         Collection collection = new Collection();
         collection.setUser(user);
         collection.setDeck(savedDeck);
-        this.collectionRepository.save(collection);
+        this.collectionRepository.saveAndFlush(collection);
 
         List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
 
+        flashcardList.forEach(flashcard -> {
+            flashcard.setDeck(savedDeck);
+        });
+
         savedDeck.setFlashcards(flashcardList);
 
-        flashcardList.forEach(flashcard -> flashcard.setDeck(savedDeck));
-
-        this.flashcardRepository.saveAll(flashcardList);
+        this.flashcardRepository.saveAllAndFlush(flashcardList);
 
         List<Review> reviews = new ArrayList<>();
 
@@ -83,7 +87,7 @@ public class DeckServiceImpl implements DeckService {
             reviews.add(review);
         });
 
-        this.reviewRepository.saveAll(reviews);
+        this.reviewRepository.saveAllAndFlush(reviews);
 
         return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
