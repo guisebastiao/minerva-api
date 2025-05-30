@@ -17,5 +17,10 @@ public record DeckDTO(
         String description,
 
         @NotNull(message = "Informe se sua coleção de flashcards é publica")
-        Boolean isPublic
+        Boolean isPublic,
+
+        @Valid
+        @NotNull(message = "A lista de flashcards não pode ser nula")
+        @Size(min = 1, message = "A coleção deve conter pelo menos um flashcard")
+        ValidList<FlashcardDTO> flashcards
 ){ }
