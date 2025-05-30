@@ -67,27 +67,7 @@ public class DeckServiceImpl implements DeckService {
 
         this.collectionRepository.save(collection);
 
-        List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
-
-        flashcardList.forEach(flashcard -> flashcard.setDeck(savedDeck));
-
-        this.flashcardRepository.saveAll(flashcardList);
-
-        savedDeck.setFlashcards(flashcardList);
-
-        List<Review> reviews = new ArrayList<>();
-
-        savedDeck.getFlashcards().forEach(flashcard -> {
-            Review review = new Review();
-            review.setDeck(deck);
-            review.setUser(deck.getUser());
-            review.setFlashcard(flashcard);
-            reviews.add(review);
-        });
-
-        this.reviewRepository.saveAll(reviews);
-
-        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
+        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, savedDeck.getId(), null, null);
     }
 
     @Override
