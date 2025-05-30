@@ -50,12 +50,11 @@ public class DeckServiceImpl implements DeckService {
     private FlashcardMapper flashcardMapper;
 
     @Override
-    @Transactional
     public DefaultDTO createDeck(DeckDTO deckDTO) {
         User user = this.getAuthenticatedUser();
 
         Deck deck = this.deckMapper.toEntity(deckDTO);
-        deck.setUser(this.getAuthenticatedUser());
+        deck.setUser(user);
         deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
@@ -64,7 +63,6 @@ public class DeckServiceImpl implements DeckService {
         Collection collection = new Collection();
         collection.setUser(user);
         collection.setDeck(savedDeck);
-
         this.collectionRepository.save(collection);
 
         List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
