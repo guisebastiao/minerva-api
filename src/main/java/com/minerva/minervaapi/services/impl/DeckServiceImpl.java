@@ -59,37 +59,32 @@ public class DeckServiceImpl implements DeckService {
         deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
-        Deck savedDeck = this.deckRepository.saveAndFlush(deck);
+        List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
+        flashcardList.forEach(flashcard -> flashcard.setDeck(deck));
+        deck.setFlashcards(flashcardList);
+
+        Deck savedDeck = this.deckRepository.save(deck);
 
         Collection collection = new Collection();
         collection.setUser(user);
         collection.setDeck(savedDeck);
-        this.collectionRepository.saveAndFlush(collection);
+        this.collectionRepository.save(collection);
 
-        List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
-
-        flashcardList.forEach(flashcard -> {
-            flashcard.setDeck(savedDeck);
-        });
-
-        savedDeck.setFlashcards(flashcardList);
-
-        this.flashcardRepository.saveAllAndFlush(flashcardList);
-
-        List<Review> reviews = new ArrayList<>();
-
-        savedDeck.getFlashcards().forEach(flashcard -> {
+        this.flashcardRepository.saveAll(flashcardList);
+        
+        List<Review> reviews = flashcardList.stream().map(flashcard -> {
             Review review = new Review();
-            review.setDeck(deck);
-            review.setUser(deck.getUser());
+            review.setDeck(savedDeck);
+            review.setUser(user);
             review.setFlashcard(flashcard);
-            reviews.add(review);
-        });
+            return review;
+        }).toList();
 
-        this.reviewRepository.saveAllAndFlush(reviews);
+        this.reviewRepository.saveAll(reviews);
 
         return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
+
 
     @Override
     public DefaultDTO findDeckById(String deckId) {
