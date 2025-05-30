@@ -18,12 +18,6 @@ public class FlashcardController {
     @Autowired
     private FlashcardService flashcardService;
 
-    @PutMapping
-    public ResponseEntity<DefaultDTO> updateFlashcard(@RequestBody @Valid ValidList<FlashcardUpdateDTO> flashcards) {
-        DefaultDTO response = this.flashcardService.updateFlashcards(flashcards);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     @DeleteMapping("/{flashcardId}")
     public ResponseEntity<DefaultDTO> deleteFlashcard(@PathVariable String flashcardId) {
         DefaultDTO response = this.flashcardService.deleteFlashcard(flashcardId);

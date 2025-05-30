@@ -30,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private UserMapper userMapper;
 
     @Override
+    @Transactional
     public DefaultDTO login(LoginDTO loginDTO) {
         User user = this.findUserByEmail(loginDTO.email());
 

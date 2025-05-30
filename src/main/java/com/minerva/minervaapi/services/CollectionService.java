@@ -5,7 +5,6 @@ import com.minerva.minervaapi.controllers.dtos.CollectionFavoriteDTO;
 import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
 
 public interface CollectionService {
-
     DefaultDTO addNewCollection(CollectionDTO collectionDTO);
     DefaultDTO addFavorite(String deckId, CollectionFavoriteDTO collectionFavoriteDTO);
     DefaultDTO findAllCollectionsToStudy(String deckId, int offset, int limit);

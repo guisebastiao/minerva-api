@@ -1,10 +1,9 @@
 package com.minerva.minervaapi.services.impl;
 
-import com.minerva.minervaapi.controllers.dtos.DeckDTO;
-import com.minerva.minervaapi.controllers.dtos.DeckResponseDTO;
-import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
+import com.minerva.minervaapi.controllers.dtos.*;
 import com.minerva.minervaapi.controllers.mappers.DeckMapper;
 import com.minerva.minervaapi.controllers.mappers.FlashcardMapper;
+import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
 import com.minerva.minervaapi.models.*;
@@ -21,9 +20,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class DeckServiceImpl implements DeckService {
@@ -85,7 +86,6 @@ public class DeckServiceImpl implements DeckService {
         return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
 
-
     @Override
     public DefaultDTO findDeckById(String deckId) {
         Deck deck = this.findCollectionById(deckId);
@@ -100,16 +100,40 @@ public class DeckServiceImpl implements DeckService {
 
     @Override
     @Transactional
-    public DefaultDTO updateDeck(DeckDTO deckDTO, String deckId) {
+    public DefaultDTO updateDeck(DeckUpdateDTO deckUpdateDTO, String deckId) {
         Deck deck = this.findCollectionById(deckId);
 
         this.checkDeckCreator(deck.getUser());
 
-        deck.setTitle(deckDTO.title());
-        deck.setDescription(deckDTO.description());
-        deck.setIsPublic(deckDTO.isPublic());
+        deck.setTitle(deckUpdateDTO.title());
+        deck.setDescription(deckUpdateDTO.description());
+        deck.setIsPublic(deckUpdateDTO.isPublic());
 
         this.deckRepository.save(deck);
+        
+        List<UUID> ids = deckUpdateDTO.flashcards().stream()
+                .map(dto -> UUIDConverter.toUUID(dto.flashcardId()))
+                .toList();
+
+        List<Flashcard> flashcardEntity = this.findAllFlashcardByIds(ids);
+
+        List<User> users = flashcardEntity.stream()
+                .map(dto -> dto.getDeck().getUser())
+                .toList();
+
+        this.checkFlashcardBelongToUser(users);
+
+        Map<UUID, FlashcardUpdateDTO> dtoMap = deckUpdateDTO.flashcards().stream()
+                .collect(Collectors.toMap(dto -> UUIDConverter.toUUID(dto.flashcardId()), Function.identity()));
+
+        for(Flashcard flashcard : flashcardEntity) {
+            FlashcardUpdateDTO dto = dtoMap.get(flashcard.getId());
+            flashcard.setQuestion(dto.question());
+            flashcard.setAnswer(dto.answer());
+        }
+
+        this.flashcardRepository.saveAll(flashcardEntity);
+
         return new DefaultDTO("Coleção atualizada com sucesso", Boolean.TRUE, null, null, null);
     }
 
@@ -119,7 +143,7 @@ public class DeckServiceImpl implements DeckService {
         Deck deck = this.findCollectionById(deckId);
         this.checkDeckCreator(deck.getUser());
         this.deckRepository.delete(deck);
-        return new DefaultDTO("Coleção deletada com sucesso", Boolean.TRUE, null, null, null);
+        return new DefaultDTO("Coleção excluida com sucesso", Boolean.TRUE, null, null, null);
     }
 
     private User getAuthenticatedUser() {
@@ -135,5 +159,25 @@ public class DeckServiceImpl implements DeckService {
         if(!creator.getId().equals(this.getAuthenticatedUser().getId())) {
             throw new UnauthorizedException("Você não tem permissão para acessar esta coleção");
         }
+    }
+
+    private List<Flashcard> findAllFlashcardByIds(List<UUID> flashcardIds) {
+        List<Flashcard> flashcards = flashcardRepository.findAllByIdIn(flashcardIds);
+
+        if(flashcards.size() != flashcardIds.size()) {
+            throw new BadRequestException("Alguns IDs dos flashcards não foram encontrados");
+        }
+
+        return flashcards;
+    }
+
+    private void checkFlashcardBelongToUser(List<User> users) {
+        User authenticatedUser = this.getAuthenticatedUser();
+
+        users.forEach(user -> {
+            if(!user.getId().equals(authenticatedUser.getId())) {
+                throw new UnauthorizedException("Você não tem permissão para acessar este flashcard");
+            }
+        });
     }
 }

@@ -59,7 +59,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 
         this.assessmentRepository.delete(assessment);
 
-        return new DefaultDTO("Avaliação deletada com sucesso", Boolean.TRUE, null, null, null);
+        return new DefaultDTO("Avaliação excluida com sucesso", Boolean.TRUE, null, null, null);
     }
 
     private Deck findDeckById(String deckId) {

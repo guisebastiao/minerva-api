@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
         this.userRepository.delete(user);
 
-        return new DefaultDTO("Sua conta foi deletada com sucesso", Boolean.TRUE, null, null, null);
+        return new DefaultDTO("Sua conta foi excluida com sucesso", Boolean.TRUE, null, null, null);
     }
 
     private User getAuthenticatedUser() {
