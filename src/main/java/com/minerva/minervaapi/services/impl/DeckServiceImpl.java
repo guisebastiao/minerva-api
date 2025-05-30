@@ -58,10 +58,8 @@ public class DeckServiceImpl implements DeckService {
         deck.setUser(user);
         deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
-        System.out.println("Deck criado: " + deck.getPublicId());
 
-        Deck savedDeck = this.deckRepository.saveAndFlush(deck);
-        System.out.println("Deck salvo: " + savedDeck.getId());
+        Deck savedDeck = this.deckRepository.save(deck);
 
         Collection collection = new Collection();
         collection.setUser(user);
