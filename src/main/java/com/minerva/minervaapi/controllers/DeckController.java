@@ -1,6 +1,7 @@
 package com.minerva.minervaapi.controllers;
 
 import com.minerva.minervaapi.controllers.dtos.DeckDTO;
+import com.minerva.minervaapi.controllers.dtos.DeckUpdateDTO;
 import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
 import com.minerva.minervaapi.services.DeckService;
 import jakarta.validation.Valid;
@@ -29,8 +30,8 @@ public class DeckController {
     }
 
     @PutMapping("/{deckId}")
-    public ResponseEntity<DefaultDTO> updateDeck(@RequestBody @Valid DeckDTO deckDTO, @PathVariable String deckId) {
-        DefaultDTO response = this.deckService.updateDeck(deckDTO, deckId);
+    public ResponseEntity<DefaultDTO> updateDeck(@RequestBody @Valid DeckUpdateDTO deckUpdateDTO, @PathVariable String deckId) {
+        DefaultDTO response = this.deckService.updateDeck(deckUpdateDTO, deckId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
