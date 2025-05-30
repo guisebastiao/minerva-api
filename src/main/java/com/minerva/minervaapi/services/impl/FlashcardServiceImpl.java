@@ -46,6 +46,31 @@ public class FlashcardServiceImpl implements FlashcardService {
     private AuthProvider authProvider;
 
     @Override
+    public DefaultDTO createFlashcards(String deckId, List<FlashcardDTO> flashcards) {
+        Deck deck = this.findDeckById(deckId);
+
+        List<Flashcard> flashcardList = flashcardMapper.toEntities(flashcards);
+
+        flashcardList.forEach(flashcard -> flashcard.setDeck(deck));
+
+        this.flashcardRepository.saveAll(flashcardList);
+
+        List<Review> reviews = new ArrayList<>();
+
+        deck.getFlashcards().forEach(flashcard -> {
+            Review review = new Review();
+            review.setDeck(deck);
+            review.setUser(deck.getUser());
+            review.setFlashcard(flashcard);
+            reviews.add(review);
+        });
+
+        this.reviewRepository.saveAll(reviews);
+
+        return new DefaultDTO("Flashcards criados com sucesso", Boolean.TRUE, null, null, null);
+    }
+
+    @Override
     public DefaultDTO updateFlashcards(List<FlashcardUpdateDTO> flashcards) {
         List<UUID> ids = flashcards.stream()
                 .map(dto -> UUIDConverter.toUUID(dto.flashcardId()))

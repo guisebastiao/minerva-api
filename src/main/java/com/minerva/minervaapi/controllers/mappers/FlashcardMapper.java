@@ -13,5 +13,4 @@ public interface FlashcardMapper {
     FlashcardResponseDTO toDTO(Flashcard flashcard);
     Flashcard toEntity(FlashcardDTO flashcardDTO);
     List<Flashcard> toEntities(List<FlashcardDTO> flashcards);
-
 }

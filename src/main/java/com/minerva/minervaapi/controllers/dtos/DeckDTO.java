@@ -1,7 +1,5 @@
 package com.minerva.minervaapi.controllers.dtos;
 
-import com.minerva.minervaapi.utils.ValidList;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,10 +15,5 @@ public record DeckDTO(
         String description,
 
         @NotNull(message = "Informe se sua coleção de flashcards é publica")
-        Boolean isPublic,
-
-        @Valid
-        @NotNull(message = "A lista de flashcards não pode ser nula")
-        @Size(min = 1, message = "A coleção deve conter pelo menos um flashcard")
-        ValidList<FlashcardDTO> flashcards
+        Boolean isPublic
 ){ }
