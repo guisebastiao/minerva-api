@@ -52,7 +52,6 @@ public class DeckServiceImpl implements DeckService {
     @Override
     public DefaultDTO createDeck(DeckDTO deckDTO) {
         User user = this.getAuthenticatedUser();
-        System.out.println("Usuário autenticado: " + user.getId());
 
         Deck deck = this.deckMapper.toEntity(deckDTO);
         deck.setUser(user);
@@ -66,7 +65,27 @@ public class DeckServiceImpl implements DeckService {
         collection.setDeck(savedDeck);
         this.collectionRepository.save(collection);
 
-        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, savedDeck.getId(), null, null);
+        List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());
+
+        savedDeck.setFlashcards(flashcardList);
+
+        flashcardList.forEach(flashcard -> flashcard.setDeck(savedDeck));
+
+        this.flashcardRepository.saveAll(flashcardList);
+
+        List<Review> reviews = new ArrayList<>();
+
+        savedDeck.getFlashcards().forEach(flashcard -> {
+            Review review = new Review();
+            review.setDeck(deck);
+            review.setUser(deck.getUser());
+            review.setFlashcard(flashcard);
+            reviews.add(review);
+        });
+
+        this.reviewRepository.saveAll(reviews);
+
+        return new DefaultDTO("Coleção criada com sucesso", Boolean.TRUE, null, null, null);
     }
 
     @Override
