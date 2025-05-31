@@ -140,7 +140,23 @@ public class DeckServiceImpl implements DeckService {
             flashcardsToSave.add(flashcard);
         }
 
-        this.flashcardRepository.saveAll(flashcardsToSave);
+        List<Flashcard> savedFlashcards = this.flashcardRepository.saveAll(flashcardsToSave);
+        User user = this.getAuthenticatedUser();
+
+        List<Flashcard> flashcardsWithoutReview = savedFlashcards.stream()
+                .filter(flashcard -> !reviewRepository.existsByDeckAndUserAndFlashcard(deck, user, flashcard))
+                .toList();
+
+        List<Review> reviews = flashcardsWithoutReview.stream()
+                .map(flashcard -> {
+                    Review review = new Review();
+                    review.setDeck(deck);
+                    review.setUser(user);
+                    review.setFlashcard(flashcard);
+                    return review;
+                }).toList();
+
+        reviewRepository.saveAll(reviews);
 
         return new DefaultDTO("Coleção atualizada com sucesso", Boolean.TRUE, null, null, null);
     }
