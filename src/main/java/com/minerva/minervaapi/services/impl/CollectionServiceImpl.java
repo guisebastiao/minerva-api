@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.*;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -133,7 +134,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         Pageable pageable = PageRequest.of(offset, limit);
 
-        Page<Collection> resultPage = collectionRepository.findAllByUserAndDeck_TitleContainingIgnoreCase(user, search, pageable);
+        Page<Collection> resultPage = collectionRepository.findAllByUserAndDeck_TitleContainingIgnoreCase(user, this.searchNormalize(search), pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
@@ -190,5 +191,14 @@ public class CollectionServiceImpl implements CollectionService {
         if(!deck.getIsPublic() && !deck.getUser().getId().equals(this.getAuthenticatedUser().getId())) {
             throw new UnauthorizedException("Você não tem permissão sobre essa coleção");
         }
+    }
+
+    private String searchNormalize(String search) {
+        if (search == null) return null;
+
+        String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        return normalizedSearch.trim();
     }
 }
