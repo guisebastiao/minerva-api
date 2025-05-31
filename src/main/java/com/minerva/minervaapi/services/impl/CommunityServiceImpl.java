@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.List;
 
 @Service
@@ -29,7 +30,7 @@ public class CommunityServiceImpl implements CommunityService {
     public DefaultDTO findAllPublicCollections(String search, String order, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit, this.sorting(order));
 
-        Page<Deck> resultPage = this.deckRepository.findAllByIsPublicAndTitleContainingIgnoreCase(true, search, pageable);
+        Page<Deck> resultPage = this.deckRepository.findAllByIsPublicAndTitleContainingIgnoreCase(true, this.searchNormalize(search), pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
@@ -48,5 +49,14 @@ public class CommunityServiceImpl implements CommunityService {
 
     private Sort sorting(String order) {
         return "date".equalsIgnoreCase(order) ? Sort.by(Sort.Direction.DESC, "createdAt") : Sort.unsorted();
+    }
+
+    private String searchNormalize(String search) {
+        if (search == null) return null;
+
+        String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        return normalizedSearch.trim();
     }
 }
