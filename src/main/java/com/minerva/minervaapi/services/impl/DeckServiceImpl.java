@@ -7,6 +7,7 @@ import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
 import com.minerva.minervaapi.models.*;
+import com.minerva.minervaapi.models.Collection;
 import com.minerva.minervaapi.repositories.CollectionRepository;
 import com.minerva.minervaapi.repositories.DeckRepository;
 import com.minerva.minervaapi.repositories.FlashcardRepository;
@@ -20,9 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -102,7 +101,6 @@ public class DeckServiceImpl implements DeckService {
     @Transactional
     public DefaultDTO updateDeck(DeckUpdateDTO deckUpdateDTO, String deckId) {
         Deck deck = this.findCollectionById(deckId);
-
         this.checkDeckCreator(deck.getUser());
 
         deck.setTitle(deckUpdateDTO.title());
@@ -111,28 +109,40 @@ public class DeckServiceImpl implements DeckService {
 
         this.deckRepository.save(deck);
 
-        List<UUID> ids = deckUpdateDTO.flashcards().stream()
-                .map(dto -> UUIDConverter.toUUID(dto.flashcardId()))
-                .toList();
+        List<Flashcard> flashcardsToSave = new ArrayList<>();
 
-        List<Flashcard> flashcardEntity = this.findAllFlashcardByIds(ids);
+        for (FlashcardUpdateDTO dto : deckUpdateDTO.flashcards()) {
+            Flashcard flashcard;
 
-        List<User> users = flashcardEntity.stream()
-                .map(dto -> dto.getDeck().getUser())
-                .toList();
+            if (dto.flashcardId() != null && !dto.flashcardId().isBlank()) {
+                UUID flashcardUUID = UUIDConverter.toUUID(dto.flashcardId());
 
-        this.checkFlashcardBelongToUser(users);
+                Optional<Flashcard> optionalFlashcard = flashcardRepository.findById(flashcardUUID);
 
-        Map<UUID, FlashcardUpdateDTO> dtoMap = deckUpdateDTO.flashcards().stream()
-                .collect(Collectors.toMap(dto -> UUIDConverter.toUUID(dto.flashcardId()), Function.identity()));
+                if (optionalFlashcard.isPresent()) {
+                    flashcard = optionalFlashcard.get();
 
-        for(Flashcard flashcard : flashcardEntity) {
-            FlashcardUpdateDTO dto = dtoMap.get(flashcard.getId());
+                    if (!flashcard.getDeck().getUser().equals(deck.getUser())) {
+                        throw new UnauthorizedException("Você não tem permissão para alterar esse flashcard");
+                    }
+
+                } else {
+                    flashcard = new Flashcard();
+                    flashcard.setId(flashcardUUID);
+                    flashcard.setDeck(deck);
+                }
+            } else {
+                flashcard = new Flashcard();
+                flashcard.setDeck(deck);
+            }
+
             flashcard.setQuestion(dto.question());
             flashcard.setAnswer(dto.answer());
+
+            flashcardsToSave.add(flashcard);
         }
 
-        this.flashcardRepository.saveAll(flashcardEntity);
+        this.flashcardRepository.saveAll(flashcardsToSave);
 
         return new DefaultDTO("Coleção atualizada com sucesso", Boolean.TRUE, null, null, null);
     }
