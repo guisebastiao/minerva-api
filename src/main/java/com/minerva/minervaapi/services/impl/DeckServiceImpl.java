@@ -112,8 +112,8 @@ public class DeckServiceImpl implements DeckService {
         for (FlashcardUpdateDTO dto : deckUpdateDTO.flashcards()) {
             Flashcard flashcard;
 
-            if (dto.flashcardId() != null && !dto.flashcardId().isBlank()) {
-                UUID flashcardUUID = UUIDConverter.toUUID(dto.flashcardId());
+            if (dto.id() != null && !dto.id().isBlank()) {
+                UUID flashcardUUID = UUIDConverter.toUUID(dto.id());
 
                 Optional<Flashcard> optionalFlashcard = flashcardRepository.findById(flashcardUUID);
 

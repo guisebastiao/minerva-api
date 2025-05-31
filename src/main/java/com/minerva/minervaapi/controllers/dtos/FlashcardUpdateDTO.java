@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.UUID;
 public record FlashcardUpdateDTO(
 
         @UUID(message = "Formato inválido")
-        String flashcardId,
+        String id,
 
         @NotBlank(message = "Informe a pergunta")
         @Size(max = 300, message = "A pergunta deve ter menos de 300 caracteres")
