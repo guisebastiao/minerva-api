@@ -54,9 +54,9 @@ public class CommunityServiceImpl implements CommunityService {
     private String searchNormalize(String search) {
         if (search == null) return null;
 
-        String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String normalized = Normalizer.normalize(search, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
 
-        return normalizedSearch.trim();
+        return normalized.trim();
     }
 }
