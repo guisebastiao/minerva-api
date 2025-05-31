@@ -14,22 +14,13 @@ import java.util.UUID;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, CollectionPk> {
-
     @Query(value = """
-        SELECT c.* FROM collections c
+        SELECT c.*
+        FROM collections c
         JOIN decks d ON c.deck_id = d.id
         WHERE c.user_id = :userId
-        AND unaccent(lower(d.title)) LIKE unaccent(lower(concat('%', :title, '%')))
-        """,
-            countQuery = """
-        SELECT count(*) FROM collections c
-        JOIN decks d ON c.deck_id = d.id
-        WHERE c.user_id = :userId
-        AND unaccent(lower(d.title)) LIKE unaccent(lower(concat('%', :title, '%')))
-        """, nativeQuery = true)
-    Page<Collection> findByUserAndDeckTitleIgnoreAccentCaseContaining(
-            @Param("userId") UUID userId,
-            @Param("title") String title,
-            Pageable pageable
-    );
+        AND lower(unaccent(d.title)) LIKE lower(unaccent(concat('%', :search, '%')))
+        ORDER BY c.favorite DESC, lower(d.title) ASC
+    """, nativeQuery = true)
+    Page<Collection> findByUserAndDeckTitle(@Param("userId") UUID userId, @Param("search") String search, Pageable pageable);
 }

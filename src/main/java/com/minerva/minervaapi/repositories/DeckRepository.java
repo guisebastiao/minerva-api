@@ -12,11 +12,10 @@ import java.util.UUID;
 
 @Repository
 public interface DeckRepository extends JpaRepository<Deck, UUID> {
-
-    @Query("""
-        SELECT d FROM Deck d
-        WHERE d.isPublic = true
-        AND function('unaccent', lower(d.title)) LIKE function('unaccent', lower(concat('%', :title, '%')))
-    """)
-    Page<Deck> findAllPublicByTitleIgnoreAccent(@Param("title") String title, Pageable pageable);
+    @Query(value = """
+        SELECT * FROM decks d
+        WHERE d.is_public = true
+        AND lower(unaccent(d.title)) LIKE lower(unaccent(concat('%', :title, '%')))
+    """, nativeQuery = true)
+    Page<Deck> findByTitle(@Param("title") String title, Pageable pageable);
 }

@@ -30,7 +30,7 @@ public class CommunityServiceImpl implements CommunityService {
     public DefaultDTO findAllPublicCollections(String search, String order, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit, this.sorting(order));
 
-        Page<Deck> resultPage = this.deckRepository.findAllPublicByTitleIgnoreAccent(search.trim(), pageable);
+        Page<Deck> resultPage = this.deckRepository.findByTitle(search.trim(), pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
