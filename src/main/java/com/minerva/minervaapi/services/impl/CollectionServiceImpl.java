@@ -134,7 +134,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         Pageable pageable = PageRequest.of(offset, limit);
 
-        Page<Collection> resultPage = collectionRepository.findAllByUserAndDeck_TitleContainingIgnoreCase(user,  this.searchNormalize(search), pageable);
+        Page<Collection> resultPage = collectionRepository.findByUserAndDeckTitleIgnoreAccentCaseContaining(user.getId(), search.trim(), pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
@@ -191,14 +191,5 @@ public class CollectionServiceImpl implements CollectionService {
         if(!deck.getIsPublic() && !deck.getUser().getId().equals(this.getAuthenticatedUser().getId())) {
             throw new UnauthorizedException("Você não tem permissão sobre essa coleção");
         }
-    }
-
-    private String searchNormalize(String search) {
-        if (search == null) return null;
-
-        String normalized = Normalizer.normalize(search, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-
-        return normalized.trim();
     }
 }
