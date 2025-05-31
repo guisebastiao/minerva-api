@@ -7,6 +7,7 @@ import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.exceptions.UnauthorizedException;
 import com.minerva.minervaapi.models.*;
+import com.minerva.minervaapi.models.Collection;
 import com.minerva.minervaapi.repositories.CollectionRepository;
 import com.minerva.minervaapi.repositories.DeckRepository;
 import com.minerva.minervaapi.repositories.ReviewRepository;
@@ -20,10 +21,7 @@ import org.springframework.data.domain.*;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -134,18 +132,15 @@ public class CollectionServiceImpl implements CollectionService {
 
         Pageable pageable = PageRequest.of(offset, limit);
 
-        Page<Collection> resultPage = collectionRepository.findAllByUserAndDeck_TitleContainingIgnoreCase(user, this.searchNormalize(search), pageable);
+        Page<Collection> resultPage = collectionRepository.findByUserAndDeckTitle(user, search.trim(), pageable);
 
         PagingDTO pagingDTO = new PagingDTO(resultPage.getTotalElements(), resultPage.getTotalPages(), offset, limit);
 
         List<CollectionResponseDTO> data = resultPage.getContent().stream()
-                .map(e -> this.collectionMapper.toDTO(e))
-                .sorted(Comparator
-                        .comparing((CollectionResponseDTO dto) -> Boolean.TRUE.equals(dto.favorite())).reversed()
-                        .thenComparing(dto -> dto.deck().title().toLowerCase()))
+                .map(this.collectionMapper::toDTO)
                 .toList();
 
-        return new DefaultDTO("Coleções retornadas com sucesso", Boolean.TRUE, data, pagingDTO, null);
+        return new DefaultDTO("Coleções retornadas com sucesso", true, data, pagingDTO, null);
     }
 
     @Override
@@ -191,14 +186,5 @@ public class CollectionServiceImpl implements CollectionService {
         if(!deck.getIsPublic() && !deck.getUser().getId().equals(this.getAuthenticatedUser().getId())) {
             throw new UnauthorizedException("Você não tem permissão sobre essa coleção");
         }
-    }
-
-    private String searchNormalize(String search) {
-        if (search == null) return null;
-
-        String normalized = Normalizer.normalize(search, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-
-        return normalized.trim();
     }
 }
