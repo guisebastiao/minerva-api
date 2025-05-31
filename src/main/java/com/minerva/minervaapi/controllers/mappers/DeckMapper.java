@@ -6,7 +6,7 @@ import com.minerva.minervaapi.models.Deck;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {DeckMapperHelper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {DeckMapperHelper.class, UserMapper.class, FlashcardMapper.class})
 public interface DeckMapper {
 
     @Mapping(target = "belongsToAuthUser", source = ".", qualifiedByName = "isBelongsToAuthUser")

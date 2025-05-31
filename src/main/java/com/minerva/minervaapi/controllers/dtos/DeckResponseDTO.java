@@ -1,6 +1,7 @@
 package com.minerva.minervaapi.controllers.dtos;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public record DeckResponseDTO(
@@ -15,5 +16,6 @@ public record DeckResponseDTO(
       Boolean belongsToCollectionUser,
       Boolean authUserAssessmentDeck,
       Double assessment,
-      ReviewResponseDTO review
+      ReviewResponseDTO review,
+      List<FlashcardResponseDTO> flashcards
 ){ }
