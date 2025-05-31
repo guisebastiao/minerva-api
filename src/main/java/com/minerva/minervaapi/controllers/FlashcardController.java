@@ -18,6 +18,12 @@ public class FlashcardController {
     @Autowired
     private FlashcardService flashcardService;
 
+    @GetMapping("/{deckId}")
+    public ResponseEntity<DefaultDTO> findAllFlashcards(@PathVariable String deckId, @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "20") int limit) {
+        DefaultDTO response = this.flashcardService.findAllFlashcards(deckId, offset, limit);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @DeleteMapping("/{flashcardId}")
     public ResponseEntity<DefaultDTO> deleteFlashcard(@PathVariable String flashcardId) {
         DefaultDTO response = this.flashcardService.deleteFlashcard(flashcardId);
