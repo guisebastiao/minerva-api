@@ -54,7 +54,6 @@ public class DeckServiceImpl implements DeckService {
 
         Deck deck = this.deckMapper.toEntity(deckDTO);
         deck.setUser(user);
-        deck.setPublicId(UUID.randomUUID());
         deck.setCreatedAt(LocalDateTime.now(ZoneOffset.UTC));
 
         List<Flashcard> flashcardList = flashcardMapper.toEntities(deckDTO.flashcards());

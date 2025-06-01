@@ -23,10 +23,7 @@ public class Deck {
 
     @Column(length = 200, nullable = false)
     private String description;
-
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
-
+    
     @Column(name = "public_id", nullable = false, unique = true)
     private UUID publicId;
 

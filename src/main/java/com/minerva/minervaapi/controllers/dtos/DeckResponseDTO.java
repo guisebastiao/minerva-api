@@ -9,7 +9,6 @@ public record DeckResponseDTO(
       String title,
       String description,
       Boolean isPublic,
-      UUID publicId,
       LocalDateTime createdAt,
       UserResponseDTO user,
       Boolean belongsToAuthUser,
