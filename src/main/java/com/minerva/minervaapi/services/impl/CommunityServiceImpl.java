@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.util.List;
 
 @Service
@@ -48,6 +47,9 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     private Sort sorting(String order) {
-        return "date".equalsIgnoreCase(order) ? Sort.by(Sort.Direction.DESC, "createdAt") : Sort.unsorted();
+        return switch (order.toLowerCase()) {
+            case "date" -> Sort.by(Sort.Direction.DESC, "created_at");
+            default -> Sort.unsorted();
+        };
     }
 }

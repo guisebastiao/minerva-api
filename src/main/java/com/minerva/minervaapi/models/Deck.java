@@ -24,13 +24,13 @@ public class Deck {
     @Column(length = 200, nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "public_id", nullable = false, unique = true)
     private UUID publicId;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
