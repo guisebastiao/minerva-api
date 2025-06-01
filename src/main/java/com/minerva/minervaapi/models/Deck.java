@@ -23,9 +23,9 @@ public class Deck {
 
     @Column(length = 200, nullable = false)
     private String description;
-    
-    @Column(name = "public_id", nullable = false, unique = true)
-    private UUID publicId;
+
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
