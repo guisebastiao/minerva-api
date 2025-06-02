@@ -1,15 +1,13 @@
 package com.minerva.minervaapi.services.impl;
 
-import com.minerva.minervaapi.controllers.dtos.CreateResetPasswordDTO;
-import com.minerva.minervaapi.controllers.dtos.DefaultDTO;
-import com.minerva.minervaapi.controllers.dtos.MailDTO;
-import com.minerva.minervaapi.controllers.dtos.ResetPasswordDTO;
+import com.minerva.minervaapi.controllers.dtos.*;
 import com.minerva.minervaapi.exceptions.BadRequestException;
 import com.minerva.minervaapi.models.ResetPassword;
 import com.minerva.minervaapi.models.User;
 import com.minerva.minervaapi.repositories.ResetPasswordRepository;
 import com.minerva.minervaapi.repositories.UserRepository;
 import com.minerva.minervaapi.services.MailService;
+import com.minerva.minervaapi.services.RabbitMailService;
 import com.minerva.minervaapi.services.ResetPasswordService;
 import com.minerva.minervaapi.utils.UUIDConverter;
 import jakarta.transaction.Transactional;
@@ -34,7 +32,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     private ResetPasswordRepository resetPasswordRepository;
 
     @Autowired
-    private MailService mailService;
+    private RabbitMailService rabbitMailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -63,7 +61,13 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
 
         String link = this.generateLink(resetPasswordSaved.getToken());
         String template = this.templateMail(link);
-        this.sendMail(template, resetPasswordSaved.getUser());
+
+        String subject = "Recuperar Senha - Minerva";
+        MailDTO mailDTO = new MailDTO(user.getEmail(), subject, template);
+
+        RabbitMailDTO rabbitMailDTO = new RabbitMailDTO(mailDTO);
+
+        rabbitMailService.producer(rabbitMailDTO);
 
         return new DefaultDTO("Você recebeu um email para redefinir sua senha", Boolean.TRUE, null, null, null);
     }
@@ -100,12 +104,6 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     }
 
     private String generateLink(UUID token) {
-        return String.format(this.frontendUrl + "/reset-password?token=" + token);
-    }
-
-    private void sendMail(String template, User user) {
-        String subject = "Recuperar Senha - Minerva";
-        MailDTO mailDTO = new MailDTO(user.getEmail(), subject, template);
-        this.mailService.sendEmail(mailDTO);
+        return String.format(this.frontendUrl + "/forgot-password/" + token);
     }
 }
