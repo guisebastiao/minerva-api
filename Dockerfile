@@ -1,19 +1,16 @@
-FROM eclipse-temurin:21-jdk AS build
-
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
-
 COPY . .
+RUN apk add --no-cache maven && mvn clean package -DskipTests
 
-RUN apt-get update && apt-get install -y maven
-
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:21-jdk-alpine
-
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-
 COPY --from=build /app/target/minerva-api-1.0.0.jar app.jar
 
-EXPOSE 8080
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV PORT=8080
+EXPOSE ${PORT}
+
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
