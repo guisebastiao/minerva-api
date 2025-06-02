@@ -140,22 +140,29 @@ public class DeckServiceImpl implements DeckService {
         }
 
         List<Flashcard> savedFlashcards = this.flashcardRepository.saveAll(flashcardsToSave);
-        User user = this.getAuthenticatedUser();
 
-        List<Flashcard> flashcardsWithoutReview = savedFlashcards.stream()
-                .filter(flashcard -> !reviewRepository.existsByDeckAndUserAndFlashcard(deck, user, flashcard))
-                .toList();
+        List<User> usersWithDeck = collectionRepository.findAllUsersWithDeckInCollection(deck);
 
-        List<Review> reviews = flashcardsWithoutReview.stream()
-                .map(flashcard -> {
+        if (!usersWithDeck.contains(deck.getUser())) {
+            usersWithDeck.add(deck.getUser());
+        }
+
+        List<Review> newReviews = new ArrayList<>();
+
+        for (User user : usersWithDeck) {
+            for (Flashcard flashcard : savedFlashcards) {
+                boolean alreadyExists = reviewRepository.existsByDeckAndUserAndFlashcard(deck, user, flashcard);
+                if (!alreadyExists) {
                     Review review = new Review();
                     review.setDeck(deck);
                     review.setUser(user);
                     review.setFlashcard(flashcard);
-                    return review;
-                }).toList();
+                    newReviews.add(review);
+                }
+            }
+        }
 
-        reviewRepository.saveAll(reviews);
+        reviewRepository.saveAll(newReviews);
 
         return new DefaultDTO("Coleção atualizada com sucesso", Boolean.TRUE, null, null, null);
     }
