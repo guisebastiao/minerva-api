@@ -2,6 +2,7 @@ package com.minerva.minervaapi.services.impl;
 
 import com.minerva.minervaapi.controllers.dtos.*;
 import com.minerva.minervaapi.exceptions.BadRequestException;
+import com.minerva.minervaapi.exceptions.EntityNotFoundException;
 import com.minerva.minervaapi.models.ResetPassword;
 import com.minerva.minervaapi.models.User;
 import com.minerva.minervaapi.repositories.ResetPasswordRepository;
@@ -48,7 +49,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     @Transactional
     public DefaultDTO createResetPassword(CreateResetPasswordDTO createResetPasswordDTO) {
         User user = this.userRepository.findByEmail(createResetPasswordDTO.email())
-                .orElseThrow(() -> new RuntimeException("Esse e-mail não está cadastrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Esse e-mail não está cadastrado"));
 
         this.resetPasswordRepository.deleteByUserId(user.getId());
 
