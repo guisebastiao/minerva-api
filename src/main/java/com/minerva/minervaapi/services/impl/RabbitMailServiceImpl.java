@@ -5,6 +5,7 @@ import com.minerva.minervaapi.controllers.dtos.RabbitMailDTO;
 import com.minerva.minervaapi.services.MailService;
 import com.minerva.minervaapi.services.RabbitMailService;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,8 @@ public class RabbitMailServiceImpl implements RabbitMailService {
     @Autowired
     private MailService mailService;
 
-    @Override
     @Transactional
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void consumer(RabbitMailDTO emailConsumerDTO) {
         mailService.sendEmail(emailConsumerDTO.mailDTO());
     }

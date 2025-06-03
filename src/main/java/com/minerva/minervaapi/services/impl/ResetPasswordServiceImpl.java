@@ -79,6 +79,10 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
         ResetPassword resetPassword = this.resetPasswordRepository.findByToken(UUIDConverter.toUUID(token))
                 .orElseThrow(() -> new BadRequestException("A recuperação da sua senha se expirou ou ela já foi alterada"));
 
+        if (resetPassword.getExpiryDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+            throw new BadRequestException("A recuperação da senha expirou");
+        }
+
         if (!resetPasswordDTO.newPassword().equals(resetPasswordDTO.confirmPassword())) {
             throw new BadRequestException("As senhas não se coincidem");
         }
