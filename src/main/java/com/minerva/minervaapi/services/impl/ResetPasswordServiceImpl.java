@@ -105,6 +105,6 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     }
 
     private String generateLink(UUID token) {
-        return String.format(this.frontendUrl + "/forgot-password/" + token);
+        return String.format(this.frontendUrl + "/reset-password/" + token);
     }
 }
