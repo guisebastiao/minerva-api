@@ -48,7 +48,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     private Sort sorting(String order) {
         return switch (order.toLowerCase()) {
-            case "date" -> Sort.by(Sort.Direction.DESC, "created_at");
+            case "date" -> Sort.by(Sort.Direction.DESC, "createdAt");
             default -> Sort.unsorted();
         };
     }
