@@ -60,36 +60,44 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private Review applySM2Algorithm(Review review, Integer quality) {
-        if(quality >= 1) {
-            int newInterval;
+        int sm2Quality = this.mapToSm2Quality(quality);
 
-            if(review.getRepetition() == 0) {
+        if (sm2Quality < 3) {
+            review.setRepetition(0);
+            review.setDaysInterval(1);
+        } else {
+            int newInterval;
+            if (review.getRepetition() == 0) {
                 newInterval = 1;
-            } else if(review.getRepetition() == 1) {
+            } else if (review.getRepetition() == 1) {
                 newInterval = 6;
             } else {
                 newInterval = (int) Math.round(review.getDaysInterval() * review.getEasinessFactor());
             }
-
             review.setDaysInterval(newInterval);
             review.setRepetition(review.getRepetition() + 1);
-
-            double efAdjustment = 0.1 - (3 - quality) * (0.08 + (3 - quality) * 0.02);
-            double newEf = review.getEasinessFactor() + efAdjustment;
-
-            if(newEf < 1.3) {
-                newEf = 1.3;
-            }
-
-            review.setEasinessFactor(newEf);
-        } else {
-            review.setRepetition(0);
-            review.setDaysInterval(1);
         }
+
+        double delta = (0.1 - (5 - sm2Quality) * (0.08 + (5 - sm2Quality) * 0.02));
+        double newEf = review.getEasinessFactor() + delta;
+        if (newEf < 1.3) {
+            newEf = 1.3;
+        }
+        review.setEasinessFactor(newEf);
 
         review.setReviewedAt(LocalDateTime.now());
         review.setNextReviewDate(LocalDate.now().plusDays(review.getDaysInterval()));
 
         return review;
+    }
+
+    private int mapToSm2Quality(int userQuality) {
+        switch (userQuality) {
+            case 0: return 0;
+            case 1: return 3;
+            case 2: return 4;
+            case 3: return 5;
+            default: return 0;
+        }
     }
 }
