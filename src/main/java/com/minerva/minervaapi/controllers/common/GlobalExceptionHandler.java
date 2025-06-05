@@ -79,6 +79,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<DefaultDTO> handleRuntimeException(RuntimeException e) {
+        System.out.println(e);
         DefaultDTO response = new DefaultDTO("Ocorreu um erro inesperado, tente novamente mais tarde", Boolean.FALSE, null, null, null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
