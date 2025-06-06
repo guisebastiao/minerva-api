@@ -68,6 +68,13 @@ public class CollectionServiceImpl implements CollectionService {
 
         List<Review> reviews = new ArrayList<>();
 
+        List<Flashcard> flashcards = deck.getFlashcards();
+        List<Review> existingReviews = reviewRepository.findByDeckAndUserAndFlashcardIn(deck, user, flashcards);
+
+        if(existingReviews != null && !existingReviews.isEmpty()) {
+            return new DefaultDTO("Nova coleção adicionada com sucesso", Boolean.TRUE, null, null, null);
+        }
+
         deck.getFlashcards().forEach(flashcard -> {
             Review review = new Review();
             review.setDeck(deck);

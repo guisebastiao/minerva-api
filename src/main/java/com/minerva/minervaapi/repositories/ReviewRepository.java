@@ -17,5 +17,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     List<Review> findAllByDeckAndUser(Deck deck, User user);
     Optional<Review> findByUserAndFlashcard(User user, Flashcard flashcard);
     boolean existsByDeckAndUserAndFlashcard(Deck deck, User user, Flashcard flashcard);
+    List<Review> findByDeckAndUserAndFlashcardIn(Deck deck, User user, List<Flashcard> flashcards);
     Page<Review> findByDeckAndUserAndNextReviewDateLessThanEqualOrNextReviewDateIsNull(Deck deck, User user, LocalDate currentDate, Pageable pageable);
 }
