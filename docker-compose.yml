@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2.4"
 services:
   backend:
     container_name: backend
@@ -10,6 +10,9 @@ services:
     depends_on:
       - mysql
       - rabbitmq
+    mem_limit: 512m
+    command: java -Xmx450m -jar app.jar
+
   mysql:
     container_name: mysql
     image: mysql:8.0
@@ -20,6 +23,9 @@ services:
       - database-volume:/var/lib/mysql
     ports:
       - "3310:3306"
+    mem_limit: 256m
+    command: --innodb-buffer-pool-size=64M
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management
@@ -29,5 +35,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    mem_limit: 128m
+
 volumes:
   database-volume:
